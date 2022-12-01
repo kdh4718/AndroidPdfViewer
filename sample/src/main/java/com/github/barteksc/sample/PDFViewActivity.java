@@ -15,6 +15,8 @@
  */
 package com.github.barteksc.sample;
 
+import static android.app.ProgressDialog.show;
+
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,8 +27,10 @@ import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
@@ -44,11 +48,14 @@ import org.androidannotations.annotations.OnActivityResult;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
+import android.view.MotionEvent;
+
+import android.support.design.widget.BottomNavigationView;
 
 import java.util.List;
 
 @EActivity(R.layout.activity_main)
-@OptionsMenu(R.menu.options)
+@OptionsMenu(R.menu.bottom_navigation)
 public class PDFViewActivity extends AppCompatActivity implements OnPageChangeListener, OnLoadCompleteListener,
         OnPageErrorListener {
 
@@ -70,8 +77,18 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     Integer pageNumber = 0;
 
     String pdfFileName;
+    @OptionsItem(R.id.first_tab)
+    void pickC(){
+        Log.i("first", "touch");
 
-    @OptionsItem(R.id.pickFile)
+        // 버튼 클릭 시 1페이지 아래로 이동
+        int cur_page = pdfView.getCurrentPage();
+        pdfView.jumpTo(cur_page+1);
+    }
+
+
+
+    @OptionsItem(R.id.second_tab)
     void pickFile() {
         int permissionCheck = ContextCompat.checkSelfPermission(this,
                 READ_EXTERNAL_STORAGE);
@@ -94,6 +111,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         intent.setType("application/pdf");
         try {
             startActivityForResult(intent, REQUEST_CODE);
+            BottomNavigationView bottomNavigationView = findViewById(R.id.second_tab);
+
         } catch (ActivityNotFoundException e) {
             //alert user that file manager not working
             Toast.makeText(this, R.string.toast_pick_file_error, Toast.LENGTH_SHORT).show();
